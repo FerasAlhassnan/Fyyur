@@ -72,7 +72,7 @@ def format_datetime(value, format='medium'):
       format="EEEE MMMM, d, y 'at' h:mma"
   elif format == 'medium':
       format="EE MM, dd, y h:mma"
-  return babel.dates.format_datetime(date, format)
+  return babel.dates.format_datetime(date, format, locale='en')
 
 app.jinja_env.filters['datetime'] = format_datetime
 
@@ -470,12 +470,12 @@ def create_artist_submission():
     error=True
     db.session.rollback()
     print(sys.exc_info())
+    # TODO: on unsuccessful db insert, flash an error instead.
     flash('An error occurred. Artist ' + name + ' could not be listed.')
   finally:
     db.session.close()
 
     
-  # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
   return render_template('pages/home.html')
 
