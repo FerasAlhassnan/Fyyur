@@ -241,24 +241,23 @@ def create_venue_submission():
     else:
       allGenres = genres[0]
 
+    # TODO: modify data to be the data object returned from db insertion
     venue = Venue(name=name, city=city, state=state, address=address, phone=phone, genres=allGenres, facebook_link=facebook_link)
     db.session.add(venue)
     db.session.commit()
 
-  # TODO: modify data to be the data object returned from db insertion
-
-  # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    # on successful db insert, flash success
+    flash('Venue ' + name + ' was successfully listed!')
   except:
     error=True
     db.session.rollback()
     print(sys.exc_info())
+    # TODO: on unsuccessful db insert, flash an error instead.
+    # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+    flash('An error occurred. Venue ' + name + ' could not be listed.')
   finally:
     db.session.close()
   
-
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 
@@ -447,10 +446,35 @@ def create_artist_form():
 def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  error = False
+  try:
+    name = request.form.get('name')
+    city = request.form.get('city')
+    state = request.form.get('state')
+    phone = request.form.get('phone')
+    genres = request.form.getlist('genres')
+    facebook_link = request.form.get('facebook_link')
+    # TODO: modify data to be the data object returned from db insertion
+    allGenres = ''
+    if len(genres) > 1:
+      for genre in genres:
+        allGenres += genre + ', '
+    else:
+      allGenres = genres[0]
+    artist = Artist(name=name, city=city, state=state, phone=phone, genres=allGenres, facebook_link=facebook_link)
+    db.session.add(artist)
+    db.session.commit()
+    # on successful db insert, flash success
+    flash('Artist ' + name + ' was successfully listed!')
+  except:
+    error=True
+    db.session.rollback()
+    print(sys.exc_info())
+    flash('An error occurred. Artist ' + name + ' could not be listed.')
+  finally:
+    db.session.close()
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
   return render_template('pages/home.html')
