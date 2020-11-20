@@ -66,7 +66,7 @@ class Show (db.Model):
     __tablename__ = 'show'
     Venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'), primary_key=True)
     Artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), primary_key=True)
-    Start_time = db.Column(db.DateTime)
+    start_time = db.Column(db.String(120))
     Artist = db.relationship("Artist", backref="Venue_Show")
     Venue = db.relationship("Venue", backref="Artist_Show")
 
@@ -532,6 +532,19 @@ def shows():
     "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
     "start_time": "2035-04-15T20:00:00.000Z"
   }]
+  shows = Show.query.all()
+  body = {}
+  for show in shows:
+    venue = Venue.query.filter_by(id=show.Venue_id).all()
+    artist = Artist.query.filter_by(id=show.Artist_id).all()
+    body['venue_id'] = show.Venue_id
+    body['venue_name'] = venue[0].name
+    body['artist_id'] = show.Artist_id
+    body['artist_name'] = artist[0].name
+    body['start_time'] = show.start_time
+  
+  
+  data.append(body)
   return render_template('pages/shows.html', shows=data)
 
 @app.route('/shows/create')
@@ -554,7 +567,7 @@ def create_show_submission():
     if artist:
       if venue:
         # on successful db insert, flash success
-        venue.Artist_Show.append(Show(Artist=artist, Start_time=start_time))
+        venue.Artist_Show.append(Show(Artist=artist, start_time=start_time))
         db.session.commit()
         flash('Show was successfully listed!')
       else:
