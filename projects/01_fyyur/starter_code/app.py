@@ -293,6 +293,15 @@ def artists():
     "id": 6,
     "name": "The Wild Sax Band",
   }]
+  allArtists = Artist.query.order_by('id').all() 
+  allBodyData = []
+  for artist in allArtists:
+    body = {}
+    body['id'] = artist.id
+    body['name'] = artist.name
+    allBodyData.append(body)
+  for body in allBodyData:
+    data.append(body)
   return render_template('pages/artists.html', artists=data)
 
 @app.route('/artists/search', methods=['POST'])
@@ -533,18 +542,22 @@ def shows():
     "start_time": "2035-04-15T20:00:00.000Z"
   }]
   shows = Show.query.all()
-  body = {}
+  allBodyData = []
   for show in shows:
+    body = {}
     venue = Venue.query.filter_by(id=show.Venue_id).all()
     artist = Artist.query.filter_by(id=show.Artist_id).all()
     body['venue_id'] = show.Venue_id
     body['venue_name'] = venue[0].name
     body['artist_id'] = show.Artist_id
     body['artist_name'] = artist[0].name
+    body['artist_image_link'] = artist[0].image_link
     body['start_time'] = show.start_time
+    allBodyData.append(body)
   
-  
-  data.append(body)
+  for body in allBodyData:
+    data.append(body)
+
   return render_template('pages/shows.html', shows=data)
 
 @app.route('/shows/create')
