@@ -121,6 +121,29 @@ def venues():
       "num_upcoming_shows": 0,
     }]
   }]
+  allBodyData = [] 
+  allVenues = Venue.query.order_by('id').all()
+  city = []
+  for venues in allVenues:
+    body = {}
+    cityVenue = []
+    if venues.city not in city:
+      groupVenue = Venue.query.filter_by(city=venues.city, state=venues.state).order_by('id').all()
+      body['city'] = venues.city
+      body['state'] = venues.state
+      for venue in groupVenue:
+        innerVenue = {}
+        innerVenue['id'] = venue.id
+        innerVenue['name'] = venue.name
+        innerVenue['num_upcoming_shows'] = 0
+        cityVenue.append(innerVenue)
+      city.append(venues.city)
+      body['venues'] = cityVenue
+      allBodyData.append(body)
+
+  for body in allBodyData:
+    data.append(body)
+
   return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
